@@ -1,8 +1,8 @@
 {
   "workflow": {
     "unique_name": "definition_workflow_02TGWV4ABG1QW7HpF1DVpbCZh9P3fLW3T9a",
-    "name": "Atomic-Python - Format Json",
-    "title": "Atomic-Python - Format Json",
+    "name": "Atomic-PythonFormatJson",
+    "title": "Atomic-PythonFormatJson",
     "type": "generic.workflow",
     "base_type": "workflow",
     "variables": [
@@ -11,14 +11,14 @@
         "properties": {
           "value": "",
           "scope": "local",
-          "name": "slack_message",
+          "name": "webex_message",
           "type": "datatype.string",
           "is_required": false,
           "display_on_wizard": false,
           "is_invisible": false,
           "variable_string_format": "text"
         },
-        "unique_name": "variable_workflow_02TGWYPFRH45Q53j0aeoDQMXxFIlxvFvGxR",
+        "unique_name": "variable_workflow_02TGWYWDZABUG4QIOaGqmLa9BKoo3ClM4M2",
         "object_type": "variable_workflow"
       },
       {
@@ -41,14 +41,14 @@
         "properties": {
           "value": "",
           "scope": "local",
-          "name": "webex_message",
+          "name": "slack_message",
           "type": "datatype.string",
           "is_required": false,
           "display_on_wizard": false,
           "is_invisible": false,
           "variable_string_format": "text"
         },
-        "unique_name": "variable_workflow_02TGWYWDZABUG4QIOaGqmLa9BKoo3ClM4M2",
+        "unique_name": "variable_workflow_02TGWYPFRH45Q53j0aeoDQMXxFIlxvFvGxR",
         "object_type": "variable_workflow"
       }
     ],
@@ -58,7 +58,7 @@
         "is_atomic": true
       },
       "delete_workflow_instance": false,
-      "display_name": "Atomic-Python - Format Json",
+      "display_name": "Atomic-PythonFormatJson",
       "runtime_user": {
         "target_default": true
       },
