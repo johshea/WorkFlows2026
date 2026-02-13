@@ -1,0 +1,381 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_02TG5YOVYRY3J4CEyVAmMOC3xE8N5iANDlt",
+    "name": "Technetium_DNS_ListZones",
+    "title": "Technetium_DNS_ListZones",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "tabletype_02TG8CDPONRHJ03aDdJmUG5DAtSoQwFa3hA",
+        "properties": {
+          "scope": "local",
+          "name": "zoneList",
+          "type": "datatype.table",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02TG8DAXAQ0A44vNpUI8e5lPVNwkWZbVpp2",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "variable_type_array_01JhSTW61I3ZU2IfL7dwQox83eFDzE1qUiA",
+        "properties": {
+          "value": [],
+          "scope": "local",
+          "name": "zoneList-Array",
+          "type": "datatype.array",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02TG8GGEKAMNG6PlSH9BhNt30qKyDOFTa8u",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "is_atomic": false
+      },
+      "delete_workflow_instance": false,
+      "description": "A Simple Workflow for getting a list\nof your exisiting zones and posting \nformatted output to a slack channel",
+      "display_name": "Technetium_DNS_ListZones",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "target_type": "web-service.endpoint",
+        "target_id": "definition_target_02TFVI854Z76830HFzKQgxbkb6lIdz9MPaD",
+        "execute_on_workflow_target": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_02TG5YP1COCEV65GPSkUAmQ6DiPeCusM0f0",
+        "name": "HTTP Request",
+        "title": "HTTP Request",
+        "type": "web-service.http_request",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "allow_auto_redirect": true,
+          "allow_headers_redirect": false,
+          "continue_on_error_status_code": false,
+          "continue_on_failure": false,
+          "custom_headers": [],
+          "description": "HTTP Request",
+          "display_name": "HTTP Request",
+          "method": "GET",
+          "relative_url": "/api/zones/list?token=$global.variable_02TFVF66KZ6LT7YUzyD1g0P1gSnFE4TOXYc.global.variable_02TFVF66KZ6LT7YUzyD1g0P1gSnFE4TOXYc$",
+          "runtime_user": {
+            "target_default": true
+          },
+          "skip_execution": false,
+          "target": {
+            "use_workflow_target": true
+          }
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_02TG641WE4TUD2LSpLLRWF6T4dNORivt6WK",
+        "name": "Read Table from JSON",
+        "title": "Read Table from JSON",
+        "type": "corejava.read_table_from_json",
+        "base_type": "activity",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": false,
+          "description": "Reading table data from JSON",
+          "display_name": "Read Table from JSON",
+          "input_json": "\n$activity.definition_activity_02TG5YP1COCEV65GPSkUAmQ6DiPeCusM0f0.output.response_body$",
+          "jsonpath_query": "$.response.zones",
+          "persist_output": false,
+          "populate_columns": false,
+          "skip_execution": false,
+          "table_columns": [
+            {
+              "column_name": "name",
+              "column_type": "string"
+            },
+            {
+              "column_name": "type",
+              "column_type": "string"
+            }
+          ]
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_02TG5YP44LBXN08VsG04ocCVWnRiLuaeRJh",
+        "name": "Condition Block",
+        "title": "Condition Block",
+        "type": "logic.if_else",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "description": "If-Else condition block",
+          "display_name": "Condition Block",
+          "skip_execution": false
+        },
+        "object_type": "definition_activity",
+        "blocks": [
+          {
+            "unique_name": "definition_activity_02TG5YP6FJT6G4TX6SytnW0BVTUzUScxX9H",
+            "name": "Condition Branch",
+            "title": "Condition Branch",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$activity.definition_activity_02TG5YP1COCEV65GPSkUAmQ6DiPeCusM0f0.output.succeeded$",
+                "operator": "eq",
+                "right_operand": true
+              },
+              "continue_on_failure": false,
+              "display_name": "Condition Branch",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_02TGW6HDQ6KLP0YV0zChifivyntgpUhWKyY",
+                "name": "Execute Python Script",
+                "title": "Execute Python Script",
+                "type": "python3.script",
+                "base_type": "activity",
+                "properties": {
+                  "action_timeout": 180,
+                  "continue_on_failure": false,
+                  "description": "Execute Python Script",
+                  "display_name": "Execute Python Script",
+                  "script": "\"\"\"\nXDR Workflow - Python Script Activity\nFormats JSON output from a previous activity into a clean, readable\nmessage for Slack, Webex, or other messaging apps.\n\nSETUP:\n  - Create an input variable:  raw_json (String) - mapped from previous activity output\n  - Create output variables:   formatted_message (String) - plain text formatted\n                                slack_message (String) - Slack markdown formatted\n                                webex_message (String) - Webex markdown formatted\n\"\"\"\n\nimport json\nimport sys\n\n\ndef flatten_dict(d, parent_key=\"\", sep=\" \u003e \"):\n    \"\"\"Flatten nested dicts into readable key paths.\"\"\"\n    items = []\n    for k, v in d.items():\n        new_key = f\"{parent_key}{sep}{k}\" if parent_key else k\n        if isinstance(v, dict):\n            items.extend(flatten_dict(v, new_key, sep).items())\n        else:\n            items.append((new_key, v))\n    return dict(items)\n\n\ndef format_value(value):\n    \"\"\"Format a single value for display.\"\"\"\n    if isinstance(value, bool):\n        return \"Yes\" if value else \"No\"\n    if value is None:\n        return \"N/A\"\n    if isinstance(value, list):\n        if not value:\n            return \"None\"\n        if all(isinstance(i, str) for i in value):\n            return \", \".join(value)\n        return f\"({len(value)} items)\"\n    return str(value)\n\n\ndef format_plain(data, title=\"API Response\"):\n    \"\"\"Format JSON data as plain readable text.\"\"\"\n    lines = []\n    lines.append(f\"{'=' * 50}\")\n    lines.append(f\"  {title}\")\n    lines.append(f\"{'=' * 50}\")\n    lines.append(\"\")\n\n    if isinstance(data, dict):\n        # Handle Technitium-style responses with response/status keys\n        status = data.get(\"status\", \"\")\n        response_data = data.get(\"response\", data)\n\n        if status:\n            lines.append(f\"Status: {status.upper()}\")\n            lines.append(f\"{'-' * 40}\")\n            lines.append(\"\")\n\n        if isinstance(response_data, dict):\n            flat = flatten_dict(response_data)\n            # Calculate padding for alignment\n            max_key_len = max((len(k) for k in flat.keys()), default=0)\n            for key, value in flat.items():\n                lines.append(f\"  {key:\u003c{max_key_len}}  :  {format_value(value)}\")\n        else:\n            lines.append(f\"  {format_value(response_data)}\")\n\n    elif isinstance(data, list):\n        lines.append(f\"Total Records: {len(data)}\")\n        lines.append(f\"{'-' * 40}\")\n        for i, item in enumerate(data, 1):\n            lines.append(f\"\\n  [{i}]\")\n            if isinstance(item, dict):\n                flat = flatten_dict(item)\n                max_key_len = max((len(k) for k in flat.keys()), default=0)\n                for key, value in flat.items():\n                    lines.append(\n                        f\"    {key:\u003c{max_key_len}}  :  {format_value(value)}\"\n                    )\n            else:\n                lines.append(f\"    {format_value(item)}\")\n    else:\n        lines.append(f\"  {format_value(data)}\")\n\n    lines.append(\"\")\n    lines.append(f\"{'=' * 50}\")\n    return \"\\n\".join(lines)\n\n\ndef format_slack(data, title=\"API Response\"):\n    \"\"\"Format JSON data as Slack mrkdwn.\"\"\"\n    lines = []\n    lines.append(f\"*{title}*\")\n    lines.append(\"\")\n\n    if isinstance(data, dict):\n        status = data.get(\"status\", \"\")\n        response_data = data.get(\"response\", data)\n\n        if status:\n            emoji = \":white_check_mark:\" if status == \"ok\" else \":x:\"\n            lines.append(f\"{emoji} *Status:* `{status}`\")\n            lines.append(\"\")\n\n        # Handle zone info if present\n        if isinstance(response_data, dict):\n            zone = response_data.get(\"zone\", {})\n            if zone and isinstance(zone, dict):\n                zone_name = zone.get(\"name\", \"\")\n                zone_type = zone.get(\"type\", \"\")\n                if zone_name:\n                    lines.append(f\":globe_with_meridians: *Zone:* `{zone_name}`\")\n                if zone_type:\n                    lines.append(f\":label: *Type:* `{zone_type}`\")\n                lines.append(\"\")\n\n            # Handle records list\n            records = response_data.get(\"records\", [])\n            if records:\n                lines.append(f\"*Records ({len(records)}):*\")\n                lines.append(\"```\")\n                # Table header\n                lines.append(f\"{'Name':\u003c35} {'Type':\u003c6} {'TTL':\u003c8} {'Value'}\")\n                lines.append(f\"{'-'*35} {'-'*6} {'-'*8} {'-'*20}\")\n                for rec in records:\n                    name = rec.get(\"name\", \"N/A\")\n                    rtype = rec.get(\"type\", \"N/A\")\n                    ttl = str(rec.get(\"ttl\", \"N/A\"))\n                    rdata = rec.get(\"rData\", {})\n                    # Extract the most relevant rData value\n                    value = (\n                        rdata.get(\"ipAddress\")\n                        or rdata.get(\"cname\")\n                        or rdata.get(\"nameServer\")\n                        or rdata.get(\"exchange\")\n                        or rdata.get(\"text\")\n                        or rdata.get(\"ptrName\")\n                        or str(rdata)\n                    )\n                    disabled = rec.get(\"disabled\", False)\n                    flag = \" [DISABLED]\" if disabled else \"\"\n                    lines.append(\n                        f\"{name:\u003c35} {rtype:\u003c6} {ttl:\u003c8} {value}{flag}\"\n                    )\n                lines.append(\"```\")\n            else:\n                # Generic key-value display\n                flat = flatten_dict(response_data)\n                for key, value in flat.items():\n                    lines.append(f\"• *{key}:* `{format_value(value)}`\")\n        else:\n            lines.append(f\"`{format_value(response_data)}`\")\n\n    elif isinstance(data, list):\n        lines.append(f\"*Total: {len(data)} items*\")\n        lines.append(\"```\")\n        for i, item in enumerate(data, 1):\n            if isinstance(item, dict):\n                flat = flatten_dict(item)\n                parts = [f\"{k}: {format_value(v)}\" for k, v in flat.items()]\n                lines.append(f\"[{i}] {' | '.join(parts)}\")\n            else:\n                lines.append(f\"[{i}] {format_value(item)}\")\n        lines.append(\"```\")\n    else:\n        lines.append(f\"`{format_value(data)}`\")\n\n    return \"\\n\".join(lines)\n\n\ndef format_webex(data, title=\"API Response\"):\n    \"\"\"Format JSON data as Webex markdown.\"\"\"\n    lines = []\n    lines.append(f\"## {title}\")\n    lines.append(\"\")\n\n    if isinstance(data, dict):\n        status = data.get(\"status\", \"\")\n        response_data = data.get(\"response\", data)\n\n        if status:\n            emoji = \"✅\" if status == \"ok\" else \"❌\"\n            lines.append(f\"{emoji} **Status:** `{status}`\")\n            lines.append(\"\")\n\n        if isinstance(response_data, dict):\n            zone = response_data.get(\"zone\", {})\n            if zone and isinstance(zone, dict):\n                zone_name = zone.get(\"name\", \"\")\n                zone_type = zone.get(\"type\", \"\")\n                if zone_name:\n                    lines.append(f\"🌐 **Zone:** `{zone_name}`\")\n                if zone_type:\n                    lines.append(f\"🏷️ **Type:** `{zone_type}`\")\n                lines.append(\"\")\n\n            records = response_data.get(\"records\", [])\n            if records:\n                lines.append(f\"**Records ({len(records)}):**\")\n                lines.append(\"\")\n                # Webex supports markdown tables\n                lines.append(\"| Name | Type | TTL | Value | Status |\")\n                lines.append(\"|------|------|-----|-------|--------|\")\n                for rec in records:\n                    name = rec.get(\"name\", \"N/A\")\n                    rtype = rec.get(\"type\", \"N/A\")\n                    ttl = str(rec.get(\"ttl\", \"N/A\"))\n                    rdata = rec.get(\"rData\", {})\n                    value = (\n                        rdata.get(\"ipAddress\")\n                        or rdata.get(\"cname\")\n                        or rdata.get(\"nameServer\")\n                        or rdata.get(\"exchange\")\n                        or rdata.get(\"text\")\n                        or rdata.get(\"ptrName\")\n                        or str(rdata)\n                    )\n                    disabled = rec.get(\"disabled\", False)\n                    status_str = \"❌ Disabled\" if disabled else \"✅ Active\"\n                    lines.append(\n                        f\"| `{name}` | {rtype} | {ttl} | `{value}` | {status_str} |\"\n                    )\n            else:\n                flat = flatten_dict(response_data)\n                for key, value in flat.items():\n                    lines.append(f\"- **{key}:** `{format_value(value)}`\")\n        else:\n            lines.append(f\"`{format_value(response_data)}`\")\n\n    elif isinstance(data, list):\n        lines.append(f\"**Total: {len(data)} items**\")\n        lines.append(\"\")\n        lines.append(\"| # | Details |\")\n        lines.append(\"|---|---------|\")\n        for i, item in enumerate(data, 1):\n            if isinstance(item, dict):\n                flat = flatten_dict(item)\n                parts = [f\"{k}: {format_value(v)}\" for k, v in flat.items()]\n                lines.append(f\"| {i} | {' \\\\| '.join(parts)} |\")\n            else:\n                lines.append(f\"| {i} | {format_value(item)} |\")\n    else:\n        lines.append(f\"`{format_value(data)}`\")\n\n    return \"\\n\".join(lines)\n\n\n# ============================================================\n# MAIN - This is what runs in the XDR Python Script activity\n# ============================================================\n\n# Input: raw_json comes from a previous activity's output\n# In XDR, map this to the HTTP Request activity's response body\nraw_json = $activity.definition_activity_02TG641WE4TUD2LSpLLRWF6T4dNORivt6WK.output.response_body$  # noqa: F841 - XDR injects this variable\n\n# Parse the JSON\ntry:\n    data = json.loads(raw_json) if isinstance(raw_json, str) else raw_json\nexcept (json.JSONDecodeError, TypeError) as e:\n    data = {\"error\": f\"Failed to parse JSON: {str(e)}\", \"raw\": str(raw_json)}\n\n# Set a title (customize as needed)\ntitle = \"Technitium DNS - Results\"\n\n# Generate all three formats\nformatted_message = format_plain(data, title)\nslack_message = format_slack(data, title)\nwebex_message = format_webex(data, title)",
+                  "script_queries": [
+                    {
+                      "script_query": "slack_message",
+                      "script_query_name": "slack_message",
+                      "script_query_type": "string"
+                    }
+                  ],
+                  "skip_execution": false
+                },
+                "object_type": "definition_activity"
+              },
+              {
+                "unique_name": "definition_activity_02TG9A1SLF3AA4FhXtSlXwLR3wGGNxByE7O",
+                "name": "Slack - Post Chat Message",
+                "title": "Slack - Post Chat Message",
+                "type": "workflow.atomic_workflow",
+                "base_type": "subworkflow",
+                "properties": {
+                  "continue_on_failure": false,
+                  "description": "Posts a chat message in a Slack conversation. This atomic requires the following API scope: chat:write.\n\nTarget: Slack integration target or an HTTP Endpoint for \"slack.com\" with a path of \"/api\"\n\nAccount Key: None if using an integration-provided target, access token if using an HTTP Endpoint target\n\nSteps:\n[] Make sure at least one of the content variables was provided:\n[]\u003e If not, return an error\n[] Build the authorization header and the request payload\n[] Post the message\n[] Check if the request was successful:\n[]\u003e If it wasn't, return an error\n[] Extract the request status\n[] Check if the request status was successful:\n[]\u003e If it was, attempt to extract the message data and set the output variables\n[]\u003e If it wasn't, return an error\n\nMore information about this API: https://api.slack.com/methods/chat.postMessage",
+                  "display_name": "Slack - Post Chat Message",
+                  "input": {
+                    "variable_workflow_02BXI2NGGL9GQ2nDByqvMXAFduPEy68zET0": "",
+                    "variable_workflow_02BXI2NGGLKXB5CM2fjioLatIB0BUE9S7PM": "#workflows-notifications",
+                    "variable_workflow_02BXI2NGGM9ZU6nDtRxhgKq88XmBcGiH7jD": "$global.variable_02TGCEVK5QHGV4XkmjpJfssSrKCGUx4Va6i.global.variable_02TGCEVK5QHGV4XkmjpJfssSrKCGUx4Va6i$",
+                    "variable_workflow_02BXI820CEED93hrBvEhrejejseiUPPMjP3": "",
+                    "variable_workflow_02BXI8BYIU3W11RuywskmUfLUDv2eJIBnOB": "",
+                    "variable_workflow_02BXI8YJ5N7WY2BK996B8zUQSb7uTdAjTca": "",
+                    "variable_workflow_02BXIC28TI67R5MCtjcsDnVLXgooJNxv5iG": "",
+                    "variable_workflow_02BXIC8YQ9TI338pA8Sbz58PEOuOGZ8jDCS": "",
+                    "variable_workflow_02BXJDDUK5DV22BwRXyOGZXIhlAZ3Jk4kRA": "$activity.definition_activity_02TGW6HDQ6KLP0YV0zChifivyntgpUhWKyY.output.script_queries.slack_message$",
+                    "variable_workflow_02BXM16H5KPGO3Uiqn3cllyPSmwC6pkfbiY": "full"
+                  },
+                  "runtime_user": {
+                    "target_default": true
+                  },
+                  "skip_execution": false,
+                  "target": {
+                    "override_workflow_target": true,
+                    "target_id": "definition_target_02TG9XB40K5W41SrgNotixvubc6EplIQNIf",
+                    "target_type": "web-service.endpoint"
+                  },
+                  "workflow_id": "definition_workflow_02BXI2NFVAV792Ktjp9EiqEg0n5sbq3hWNp",
+                  "workflow_name": "Slack - Post Chat Message"
+                },
+                "object_type": "definition_activity"
+              }
+            ]
+          },
+          {
+            "unique_name": "definition_activity_02TG5YPCCVOZ97gNVnQGXBeHKmMRL7JBBZL",
+            "name": "Condition Branch",
+            "title": "Condition Branch",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$activity.definition_activity_02TG5YP1COCEV65GPSkUAmQ6DiPeCusM0f0.output.succeeded$",
+                "operator": "eq",
+                "right_operand": false
+              },
+              "continue_on_failure": false,
+              "display_name": "Condition Branch",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_02TG5YPF6RE3A3cR46jD6lEXP8ITEnO3w6J",
+                "name": "Completed",
+                "title": "Completed",
+                "type": "logic.completed",
+                "base_type": "activity",
+                "properties": {
+                  "completion_type": "succeeded",
+                  "continue_on_failure": false,
+                  "description": "Completed action",
+                  "display_name": "Completed",
+                  "skip_execution": false
+                },
+                "object_type": "definition_activity"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "category_02PLFWTXZ54WX4YgUJLYDcGYMlutcBqnbHg"
+    ]
+  },
+  "categories": {
+    "category_02PLFWTXZ54WX4YgUJLYDcGYMlutcBqnbHg": {
+      "unique_name": "category_02PLFWTXZ54WX4YgUJLYDcGYMlutcBqnbHg",
+      "name": "Custom",
+      "title": "Custom",
+      "type": "basic.category",
+      "base_type": "category",
+      "category_type": "custom",
+      "object_type": "category"
+    }
+  },
+  "targets": {
+    "definition_target_02TFVI854Z76830HFzKQgxbkb6lIdz9MPaD": {
+      "unique_name": "definition_target_02TFVI854Z76830HFzKQgxbkb6lIdz9MPaD",
+      "name": "Technitium-DNS",
+      "title": "Technitium-DNS",
+      "type": "web-service.endpoint",
+      "base_type": "target",
+      "object_type": "definition_target",
+      "properties": {
+        "ao_remote_id": "02S5CKTUZZ8F82i53pNxNL6q8b0R0JqqKxc",
+        "description": "",
+        "disable_certificate_validation": false,
+        "display_name": "Technitium-DNS",
+        "host": "192.168.1.3",
+        "ignore_proxy": false,
+        "is_https_proxy": false,
+        "no_runtime_user": true,
+        "port": 5380,
+        "protocol": "http"
+      }
+    },
+    "definition_target_02TG9XB40K5W41SrgNotixvubc6EplIQNIf": {
+      "unique_name": "definition_target_02TG9XB40K5W41SrgNotixvubc6EplIQNIf",
+      "name": "Slack",
+      "title": "Slack",
+      "type": "web-service.endpoint",
+      "base_type": "target",
+      "object_type": "definition_target",
+      "properties": {
+        "disable_certificate_validation": false,
+        "display_name": "Slack",
+        "host": "slack.com",
+        "ignore_proxy": false,
+        "is_https_proxy": false,
+        "no_runtime_user": true,
+        "path": "/api",
+        "protocol": "https"
+      }
+    }
+  },
+  "variables": {
+    "variable_02TFVF66KZ6LT7YUzyD1g0P1gSnFE4TOXYc": {
+      "unique_name": "variable_02TFVF66KZ6LT7YUzyD1g0P1gSnFE4TOXYc",
+      "properties": {
+        "value": "e458a218e7ad977004ae5af70aee6dc705cdd95af795e7368e0d779d43d0abf4",
+        "scope": "global",
+        "name": "dns_api_token",
+        "type": "datatype.string",
+        "is_required": false,
+        "display_on_wizard": false,
+        "is_invisible": false,
+        "variable_string_format": "text"
+      },
+      "object_type": "variable"
+    },
+    "variable_02TGCEVK5QHGV4XkmjpJfssSrKCGUx4Va6i": {
+      "unique_name": "variable_02TGCEVK5QHGV4XkmjpJfssSrKCGUx4Va6i",
+      "properties": {
+        "value": "*****",
+        "scope": "global",
+        "name": "Slack_Bot_Token",
+        "type": "datatype.secure_string",
+        "is_required": false,
+        "display_on_wizard": false,
+        "is_invisible": false,
+        "variable_string_format": ""
+      },
+      "object_type": "variable"
+    }
+  },
+  "table_types": {
+    "tabletype_02TG8CDPONRHJ03aDdJmUG5DAtSoQwFa3hA": {
+      "unique_name": "tabletype_02TG8CDPONRHJ03aDdJmUG5DAtSoQwFa3hA",
+      "data_type": "datatype.tabletype",
+      "display_name": "Technetium-ZoneList",
+      "columns": [
+        {
+          "is_required": true,
+          "name": "name",
+          "title": "Name",
+          "type": "string"
+        },
+        {
+          "name": "type",
+          "title": "Type",
+          "type": "string"
+        }
+      ],
+      "base_type": "datatype",
+      "object_type": "tabletype"
+    }
+  },
+  "atomic_workflows": [
+    "definition_workflow_02BXI2NFVAV792Ktjp9EiqEg0n5sbq3hWNp"
+  ],
+  "remotemetas": {
+    "remote_meta_02S5CKTVG3SOT65rwlfTY3JuYg7P2exAQDC": {
+      "base_type": "remote_meta",
+      "type": "generic.remote_meta",
+      "name": "WorkFlows-RemoteTarget_01",
+      "title": "WorkFlows-RemoteTarget_01",
+      "version": "1.0.0",
+      "properties": {
+        "advanced": {
+          "require_advanced": false
+        },
+        "cloud_type": "vmware",
+        "display_name": "WorkFlows-RemoteTarget_01",
+        "network": {
+          "is_dhcp": true
+        },
+        "proxy": {
+          "require_proxy": false
+        }
+      },
+      "unique_name": "remote_meta_02S5CKTVG3SOT65rwlfTY3JuYg7P2exAQDC",
+      "object_type": "remote_meta"
+    }
+  },
+  "dependent_workflows": [
+    "definition_workflow_02BXI2NFVAV792Ktjp9EiqEg0n5sbq3hWNp"
+  ]
+}
