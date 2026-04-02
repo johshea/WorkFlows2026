@@ -1,0 +1,410 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3",
+    "name": "Meraki - List All Local DNS Records for All Profiles",
+    "title": "Meraki - List All Local DNS Records for All Profiles",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "local",
+          "name": "Local - Organization ID",
+          "type": "datatype.string",
+          "description": "Stored organization ID",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02UL520EB23KY70ZoALLWqQ79GfEdKzNXX6",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "output",
+          "name": "Output - Error Message",
+          "type": "datatype.string",
+          "description": "Error message if workflow fails",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02UL520EB2RSZ0OVBT2W3mN6ponPnNQj26w",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "output",
+          "name": "Output - DNS Records",
+          "type": "datatype.string",
+          "description": "Formatted list of all Local DNS records",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02UL520EB2M0Z6IDbtQolhEY3508Ot2VMjg",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "Success",
+          "scope": "output",
+          "name": "Output - Status",
+          "type": "datatype.string",
+          "description": "Workflow execution status",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02UL520EB2GBG5jQj7eSmpgN9U2dZKG2Hwt",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.integer",
+        "properties": {
+          "value": 0,
+          "scope": "local",
+          "name": "Local - Status Code",
+          "type": "datatype.integer",
+          "description": "Stored status code for error checking",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02UL520EB2ADC6wSKlfrCX9tBSX6e3Q8EH6",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Input - Organization Name",
+          "type": "datatype.string",
+          "description": "The name of the Meraki organization",
+          "is_required": true,
+          "display_on_wizard": true,
+          "is_invisible": false,
+          "variable_string_format": "text"
+        },
+        "unique_name": "variable_workflow_02UL520EB1URK34Tj505F7wW72yIZXoN2SB",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "is_atomic": false
+      },
+      "delete_workflow_instance": false,
+      "description": "This workflow retrieves the organization ID by name and then lists all Local DNS records for all profiles within that organization.",
+      "display_name": "Meraki - List All Local DNS Records for All Profiles",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "target_type": "meraki.endpoint",
+        "specify_on_workflow_start": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_02UL520EB2Z643qz4XeT08UropNmfN4oREP",
+        "name": "Get Organization ID",
+        "title": "Get Organization ID",
+        "type": "workflow.sub_workflow",
+        "base_type": "subworkflow",
+        "properties": {
+          "continue_on_failure": true,
+          "display_name": "Get Organization ID",
+          "input": {
+            "variable_workflow_02M605GTHU5L72i8goD4nuYixYOvQEFV7rN": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.input.variable_workflow_02UL520EB1URK34Tj505F7wW72yIZXoN2SB$",
+            "variable_workflow_02M605GTI1LUG737lDLyzxnE9jwENJNQ08W": false
+          },
+          "runtime_user": {
+            "target_default": true
+          },
+          "skip_execution": false,
+          "target": {
+            "target_type": "meraki.endpoint",
+            "use_workflow_target": true
+          },
+          "workflow_id": "definition_workflow_02M605GS81XN44qr4RBWrJ6Zazk7k0ArIYX",
+          "workflow_name": "Meraki - Get Organization By Name or ID"
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_02UL520EB35Q91MAA5P3wauiJjFfs5f2Mnf",
+        "name": "Store Org ID and Status",
+        "title": "Store Org ID and Status",
+        "type": "core.set_multiple_variables",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "Store Org ID and Status",
+          "skip_execution": false,
+          "variables_to_update": [
+            {
+              "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.local.variable_workflow_02UL520EB23KY70ZoALLWqQ79GfEdKzNXX6$",
+              "variable_value_new": "$activity.definition_activity_02UL520EB2Z643qz4XeT08UropNmfN4oREP.output.variable_workflow_02M605GTJITQP1fcLQlR8CLYAHoMomGWZvE$"
+            },
+            {
+              "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.local.variable_workflow_02UL520EB2ADC6wSKlfrCX9tBSX6e3Q8EH6$",
+              "variable_value_new": "$activity.definition_activity_02UL520EB2Z643qz4XeT08UropNmfN4oREP.output.variable_workflow_02M605GTHEWOW4TGG1xjMEivKqrrMbc2hM3$"
+            }
+          ]
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_02UL520EB3BPX2mh2Nc2pLf19NnrwmyOEXE",
+        "name": "Check Org Status",
+        "title": "Check Org Status",
+        "type": "logic.if_else",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "Check Org Status",
+          "skip_execution": false
+        },
+        "object_type": "definition_activity",
+        "blocks": [
+          {
+            "unique_name": "definition_activity_02UL520EB3HKS2Me1horohTiIAcDGHaHX5L",
+            "name": "Org Found",
+            "title": "Org Found",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.local.variable_workflow_02UL520EB2ADC6wSKlfrCX9tBSX6e3Q8EH6$",
+                "operator": "eq",
+                "right_operand": 200
+              },
+              "continue_on_failure": false,
+              "display_name": "Org Found",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_02UL520EB3ODN7KwRHUtIHBHmQu6HKYSpyv",
+                "name": "Get DNS Records",
+                "title": "Get DNS Records",
+                "type": "workflow.atomic_workflow",
+                "base_type": "subworkflow",
+                "properties": {
+                  "continue_on_failure": true,
+                  "display_name": "Get DNS Records",
+                  "input": {
+                    "variable_workflow_02OARCIQ0EKQG4LQzv4Dnf1yL3f8PNyMZwj": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.local.variable_workflow_02UL520EB23KY70ZoALLWqQ79GfEdKzNXX6$",
+                    "variable_workflow_02P699D0OMND41ZDxLZNLs99MjnwWdQ5eRD": "[]"
+                  },
+                  "runtime_user": {
+                    "target_default": true
+                  },
+                  "skip_execution": false,
+                  "target": {
+                    "target_type": "meraki.endpoint",
+                    "use_workflow_target": true
+                  },
+                  "workflow_id": "definition_workflow_02OARCIQ0EIF45AVODuZTmqINPdY3GS1Cnt",
+                  "workflow_name": "Meraki - Get Organization Appliance DNS Local Records"
+                },
+                "object_type": "definition_activity"
+              },
+              {
+                "unique_name": "definition_activity_02UL520EB3UCZ69YgS7JmdxgOcwrnP68gkM",
+                "name": "Check DNS Status",
+                "title": "Check DNS Status",
+                "type": "logic.if_else",
+                "base_type": "activity",
+                "properties": {
+                  "continue_on_failure": false,
+                  "display_name": "Check DNS Status",
+                  "skip_execution": false
+                },
+                "object_type": "definition_activity",
+                "blocks": [
+                  {
+                    "unique_name": "definition_activity_02UL520EB404U1upvEJ6DN335uFHA6vzlqW",
+                    "name": "DNS Success",
+                    "title": "DNS Success",
+                    "type": "logic.condition_block",
+                    "base_type": "activity",
+                    "properties": {
+                      "condition": {
+                        "left_operand": "$activity.definition_activity_02UL520EB3ODN7KwRHUtIHBHmQu6HKYSpyv.output.variable_workflow_02OARCIQ0EMA04hFy8rxnHC3jbxReXz2maH$",
+                        "operator": "eq",
+                        "right_operand": "200"
+                      },
+                      "continue_on_failure": false,
+                      "display_name": "DNS Success",
+                      "skip_execution": false
+                    },
+                    "object_type": "definition_activity",
+                    "actions": [
+                      {
+                        "unique_name": "definition_activity_02UL520EB460712jVpdpY9CJvB9Eg2DqW6Y",
+                        "name": "Format DNS Records",
+                        "title": "Format DNS Records",
+                        "type": "python3.script",
+                        "base_type": "activity",
+                        "properties": {
+                          "action_timeout": 180,
+                          "continue_on_failure": false,
+                          "display_name": "Format DNS Records",
+                          "script": "import sys\nimport json\n\ntry:\n    raw_data = json.loads(sys.argv[1]) if sys.argv[1] else []\nexcept Exception:\n    raw_data = []\n\nif not isinstance(raw_data, list):\n    raw_data = []\n\nif not raw_data:\n    result = \"No Local DNS records found.\"\nelse:\n    table = \"| Name | Type | IP | TTL | Profile ID |\\n\"\n    table += \"| :--- | :--- | :--- | :--- | :--- |\\n\"\n    for record in raw_data:\n        name = record.get('name', 'N/A')\n        type_ = record.get('type', 'N/A')\n        ip = record.get('ip', 'N/A')\n        ttl = record.get('ttl', 'N/A')\n        profile_id = record.get('profileId', 'N/A')\n        table += f\"| {name} | {type_} | {ip} | {ttl} | {profile_id} |\\n\"\n    result = table\n",
+                          "script_arguments": [
+                            "$activity.definition_activity_02UL520EB3ODN7KwRHUtIHBHmQu6HKYSpyv.output.variable_workflow_02OARCIQ0ENTK4nSOScJZzM5BErmWYmH400$"
+                          ],
+                          "script_queries": [
+                            {
+                              "script_query": "result",
+                              "script_query_name": "formatted_table",
+                              "script_query_type": "string"
+                            }
+                          ],
+                          "skip_execution": false
+                        },
+                        "object_type": "definition_activity"
+                      },
+                      {
+                        "unique_name": "definition_activity_02UL520EB4BOY5uPtRTjWUIyT6eOASTCxjL",
+                        "name": "Set Output Success",
+                        "title": "Set Output Success",
+                        "type": "core.set_multiple_variables",
+                        "base_type": "activity",
+                        "properties": {
+                          "continue_on_failure": false,
+                          "display_name": "Set Output Success",
+                          "skip_execution": false,
+                          "variables_to_update": [
+                            {
+                              "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.output.variable_workflow_02UL520EB2M0Z6IDbtQolhEY3508Ot2VMjg$",
+                              "variable_value_new": "$activity.definition_activity_02UL520EB460712jVpdpY9CJvB9Eg2DqW6Y.output.script_queries.formatted_table$"
+                            }
+                          ]
+                        },
+                        "object_type": "definition_activity"
+                      }
+                    ]
+                  },
+                  {
+                    "unique_name": "definition_activity_02UL520EB4HI14BC1e7WwkMg8sOIO39UrEr",
+                    "name": "DNS Failure",
+                    "title": "DNS Failure",
+                    "type": "logic.condition_block",
+                    "base_type": "activity",
+                    "properties": {
+                      "condition": {
+                        "left_operand": "$activity.definition_activity_02UL520EB3ODN7KwRHUtIHBHmQu6HKYSpyv.output.variable_workflow_02OARCIQ0EMA04hFy8rxnHC3jbxReXz2maH$",
+                        "operator": "ne",
+                        "right_operand": "200"
+                      },
+                      "continue_on_failure": false,
+                      "display_name": "DNS Failure",
+                      "skip_execution": false
+                    },
+                    "object_type": "definition_activity",
+                    "actions": [
+                      {
+                        "unique_name": "definition_activity_02UL520EB4NF55uyad7aarnxJPO40bO5jcT",
+                        "name": "Set DNS Error",
+                        "title": "Set DNS Error",
+                        "type": "core.set_multiple_variables",
+                        "base_type": "activity",
+                        "properties": {
+                          "continue_on_failure": false,
+                          "display_name": "Set DNS Error",
+                          "skip_execution": false,
+                          "variables_to_update": [
+                            {
+                              "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.output.variable_workflow_02UL520EB2GBG5jQj7eSmpgN9U2dZKG2Hwt$",
+                              "variable_value_new": "Failed"
+                            },
+                            {
+                              "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.output.variable_workflow_02UL520EB2RSZ0OVBT2W3mN6ponPnNQj26w$",
+                              "variable_value_new": "Failed to retrieve DNS records: $activity.definition_activity_02UL520EB3ODN7KwRHUtIHBHmQu6HKYSpyv.output.variable_workflow_02OARCIQ0EN1S1qYaQYRPaBshQHahpXAV9W$"
+                            }
+                          ]
+                        },
+                        "object_type": "definition_activity"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "unique_name": "definition_activity_02UL520EB4TEF1Vh2H7DWonhp3Ci5L0I54S",
+            "name": "Org Not Found",
+            "title": "Org Not Found",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.local.variable_workflow_02UL520EB2ADC6wSKlfrCX9tBSX6e3Q8EH6$",
+                "operator": "ne",
+                "right_operand": 200
+              },
+              "continue_on_failure": false,
+              "display_name": "Org Not Found",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_02UL520EB4Z454sGRyxQpPs56jyyrTIcBrV",
+                "name": "Set Org Error",
+                "title": "Set Org Error",
+                "type": "core.set_multiple_variables",
+                "base_type": "activity",
+                "properties": {
+                  "continue_on_failure": false,
+                  "display_name": "Set Org Error",
+                  "skip_execution": false,
+                  "variables_to_update": [
+                    {
+                      "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.output.variable_workflow_02UL520EB2GBG5jQj7eSmpgN9U2dZKG2Hwt$",
+                      "variable_value_new": "Failed"
+                    },
+                    {
+                      "variable_to_update": "$workflow.definition_workflow_02UL520EB18LE6wPf6pFZmrYEEkITX0q6H3.output.variable_workflow_02UL520EB2RSZ0OVBT2W3mN6ponPnNQj26w$",
+                      "variable_value_new": "Failed to find organization: $activity.definition_activity_02UL520EB2Z643qz4XeT08UropNmfN4oREP.output.variable_workflow_02M626PI3Q2OV0mssfVdKVoL7b05VXvEYFK$"
+                    }
+                  ]
+                },
+                "object_type": "definition_activity"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "category_1BMfMXSnJMyt5Ihqi7rWJr5N8cf"
+    ]
+  },
+  "atomic_workflows": [
+    "definition_workflow_02OARCIQ0EIF45AVODuZTmqINPdY3GS1Cnt"
+  ],
+  "dependent_workflows": [
+    "definition_workflow_02M605GS81XN44qr4RBWrJ6Zazk7k0ArIYX",
+    "definition_workflow_02OARCIQ0EIF45AVODuZTmqINPdY3GS1Cnt"
+  ]
+}
