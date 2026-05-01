@@ -1,0 +1,636 @@
+{
+  "workflow": {
+    "unique_name": "definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS",
+    "name": "Configure VPN Hub for Tagged Networks",
+    "title": "Configure VPN Hub for Tagged Networks",
+    "type": "generic.workflow",
+    "base_type": "workflow",
+    "variables": [
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Input - Spoke Tag",
+          "type": "datatype.string",
+          "description": "The tag used to identify spoke networks",
+          "is_required": true,
+          "display_on_wizard": true,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO7QS246FOpH0SwXNHjqX2whZeGv",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Input - Hub Network Name",
+          "type": "datatype.string",
+          "description": "The name of the network to be used as the VPN hub",
+          "is_required": true,
+          "display_on_wizard": true,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO78F33fVrRVdJFKkPi8nuUEegpv",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "local",
+          "name": "Local - Organization ID",
+          "type": "datatype.string",
+          "description": "Stored Organization ID",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO81DF6qM9KM7yXy9Pm58XJhQpKI",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "local",
+          "name": "Local - Hubs Config",
+          "type": "datatype.string",
+          "description": "JSON string for the hubs configuration",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO90JE2JbNnHk5HWtrehXkO7Pzbd",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "[]",
+          "scope": "local",
+          "name": "Local - Spoke Networks JSON",
+          "type": "datatype.string",
+          "description": "JSON string of filtered spoke networks",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO8PR97c2N8RWmGO7Vyj4hoaHrs8",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "local",
+          "name": "Local - Hub ID",
+          "type": "datatype.string",
+          "description": "Resolved Hub Network ID",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO8BBQ6t7CZxTMkoTbIkAE3483PQ",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "",
+          "scope": "input",
+          "name": "Input - Organization Name",
+          "type": "datatype.string",
+          "description": "The name of the Meraki organization",
+          "is_required": true,
+          "display_on_wizard": true,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO6VPE7aKGT6tQaNrmnlaz9X893L",
+        "object_type": "variable_workflow"
+      },
+      {
+        "schema_id": "datatype.string",
+        "properties": {
+          "value": "Success",
+          "scope": "output",
+          "name": "Output - Status",
+          "type": "datatype.string",
+          "description": "Summary of the operation outcome",
+          "is_required": false,
+          "display_on_wizard": false,
+          "is_invisible": false,
+          "variable_string_format": ""
+        },
+        "unique_name": "variable_workflow_02VAOMFKO97DZ6R9FkphUVzxvJN5mGlU9I6",
+        "object_type": "variable_workflow"
+      }
+    ],
+    "properties": {
+      "atomic": {
+        "is_atomic": false
+      },
+      "delete_workflow_instance": false,
+      "description": "Retrieves an organization, finds a hub network by name, identifies networks with a specific tag, and configures them as VPN spokes connected to that hub.",
+      "display_name": "Configure VPN Hub for Tagged Networks",
+      "runtime_user": {
+        "target_default": true
+      },
+      "target": {
+        "target_type": "meraki.endpoint",
+        "specify_on_workflow_start": true
+      }
+    },
+    "object_type": "definition_workflow",
+    "actions": [
+      {
+        "unique_name": "definition_activity_02VAOMFKO9EK27lMar3oNLHTShD5xG6ODSf",
+        "name": "Get Organization ID",
+        "title": "Get Organization ID",
+        "type": "workflow.sub_workflow",
+        "base_type": "subworkflow",
+        "properties": {
+          "action_timeout": 180,
+          "continue_on_failure": true,
+          "description": "Utility workflow to retrieve organization details using either Organization Name or ID as input. Calls Meraki API to fetch all accessible organizations, then searches for the specified match.\n\n**Returns:** Organization ID, name, URL, API status, licensing model, cloud region, and management details.\n\n**Key Features:**\n- Search by Organization Name (exact match, case-sensitive)\n- Search by Organization ID (numeric format)\n- Comprehensive output variables\n- Optional error handling with 'Ignore Errors' parameter",
+          "display_name": "Get Organization ID",
+          "input": {
+            "variable_workflow_02M605GTHU5L72i8goD4nuYixYOvQEFV7rN": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.input.variable_workflow_02VAOMFKO6VPE7aKGT6tQaNrmnlaz9X893L$",
+            "variable_workflow_02M605GTI1LUG737lDLyzxnE9jwENJNQ08W": false
+          },
+          "runtime_user": {
+            "target_default": true
+          },
+          "skip_execution": false,
+          "target": {
+            "target_type": "meraki.endpoint",
+            "use_workflow_target": true
+          },
+          "workflow_id": "definition_workflow_02M605GS81XN44qr4RBWrJ6Zazk7k0ArIYX",
+          "workflow_name": "Meraki - Get Organization By Name or ID"
+        },
+        "object_type": "definition_activity"
+      },
+      {
+        "unique_name": "definition_activity_02VAOMFKO9KWJ1BtaZbg3FmRbMhWydEaliH",
+        "name": "Check Org Found",
+        "title": "Check Org Found",
+        "type": "logic.if_else",
+        "base_type": "activity",
+        "properties": {
+          "continue_on_failure": false,
+          "display_name": "Check Org Found",
+          "skip_execution": false
+        },
+        "object_type": "definition_activity",
+        "blocks": [
+          {
+            "unique_name": "definition_activity_02VAOMFKO9V622k7U20eCJ3rz8W2op6eh1h",
+            "name": "Org Found",
+            "title": "Org Found",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$activity.definition_activity_02VAOMFKO9EK27lMar3oNLHTShD5xG6ODSf.output.variable_workflow_02M605GTJITQP1fcLQlR8CLYAHoMomGWZvE$",
+                "operator": "ne",
+                "right_operand": ""
+              },
+              "continue_on_failure": false,
+              "display_name": "Org Found",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_02VAOMFKOA5QN3HvUMpyx5dKmaF9mrOgsuT",
+                "name": "Store Org ID",
+                "title": "Store Org ID",
+                "type": "core.set_multiple_variables",
+                "base_type": "activity",
+                "properties": {
+                  "action_timeout": 180,
+                  "continue_on_failure": false,
+                  "display_name": "Store Org ID",
+                  "skip_execution": false,
+                  "variables_to_update": [
+                    {
+                      "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO81DF6qM9KM7yXy9Pm58XJhQpKI$",
+                      "variable_value_new": "$activity.definition_activity_02VAOMFKO9EK27lMar3oNLHTShD5xG6ODSf.output.variable_workflow_02M605GTJITQP1fcLQlR8CLYAHoMomGWZvE$"
+                    }
+                  ]
+                },
+                "object_type": "definition_activity"
+              },
+              {
+                "unique_name": "definition_activity_02VAOMFKOAEZ82ZpvNOyNsah9TzU6NC8PeB",
+                "name": "List All Networks",
+                "title": "List All Networks",
+                "type": "workflow.atomic_workflow",
+                "base_type": "subworkflow",
+                "properties": {
+                  "action_timeout": 180,
+                  "continue_on_failure": true,
+                  "description": "**Cisco Meraki - Networks - Get Organization Networks**\n\nList the networks that the user has privileges on in an organization\n\n**Target:** A Meraki Endpoint using HTTPS \"api.meraki.com\" port 443 and no path.\n\n**Account Key:** Meraki User API Key. API Key can be generated from Meraki Dashboard -\u003e User Profile -\u003e API Access.\n\nSteps:\n[] Sends Get Network request to Meraki\n[] Check if the request was successful:\n[]\u003e If it was, attempt to extract the results and set the output variables\n[]\u003e If it wasn't, return the error and marks the workflow as failed.\n\nNOTE: Empty attributes in the request are removed from the payload before sending to Meraki. \n\nMore information about this API: https://developer.cisco.com/meraki/api-v1/get-organization-networks/",
+                  "display_name": "List All Networks",
+                  "input": {
+                    "variable_workflow_02L9TZH6C81473IDtFQ0NIzW3jmXrgchtN9": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO81DF6qM9KM7yXy9Pm58XJhQpKI$",
+                    "variable_workflow_02LEUL5GOHN9T53T7jFQx3T2Yo04p5Xuz0r": false,
+                    "variable_workflow_02LNK5WW0RD2A20mG7v1G7gsyE2N2RrKdQd": "",
+                    "variable_workflow_02LNK5WW0RTCB1AXbOwJOBVWvUx1wdyKtkt": "withAnyTags",
+                    "variable_workflow_02LNK5WW0S5E21Q9biFSXTiLbHr7cWP2K7y": "",
+                    "variable_workflow_02LNK5WW0SE2H1zmchhUHyfX7L0XGvKmB7W": 1000,
+                    "variable_workflow_02LNK5WW0SM7R5SjIvnnytN6vYzR7wfDHeE": [],
+                    "variable_workflow_02LNK5WW0STMX38BXiY2IvPQoHQliJHSCgE": [],
+                    "variable_workflow_02LNK5WW0T0NX26NyApdlTn355uYJwcQGqW": "",
+                    "variable_workflow_02LNK5WW0T92U1HJd1sxzFrmVvwxy7NVaQn": ""
+                  },
+                  "runtime_user": {
+                    "target_default": true
+                  },
+                  "skip_execution": false,
+                  "target": {
+                    "target_type": "meraki.endpoint",
+                    "use_workflow_target": true
+                  },
+                  "workflow_id": "definition_workflow_02L9TZH5W95870XebPF2g8kSyIYcawUvljX",
+                  "workflow_name": "Meraki - Get Organization Networks"
+                },
+                "object_type": "definition_activity"
+              },
+              {
+                "unique_name": "definition_activity_02VAOMFKOAKYZ6tQFDoXqo93saFsVgtuzzq",
+                "name": "Check Networks Success",
+                "title": "Check Networks Success",
+                "type": "logic.if_else",
+                "base_type": "activity",
+                "properties": {
+                  "continue_on_failure": false,
+                  "display_name": "Check Networks Success",
+                  "skip_execution": false
+                },
+                "object_type": "definition_activity",
+                "blocks": [
+                  {
+                    "unique_name": "definition_activity_02VAOMFKOD9P42UTT7lmeSYVdhxXDsI6F5L",
+                    "name": "Success",
+                    "title": "Success",
+                    "type": "logic.condition_block",
+                    "base_type": "activity",
+                    "properties": {
+                      "condition": {
+                        "left_operand": "$activity.definition_activity_02VAOMFKOAEZ82ZpvNOyNsah9TzU6NC8PeB.output.variable_workflow_02L9TZH6C9HVU3eHnLNP91ZKEfJOnaYpBsh$",
+                        "operator": "eq",
+                        "right_operand": "200"
+                      },
+                      "continue_on_failure": false,
+                      "display_name": "Success",
+                      "skip_execution": false
+                    },
+                    "object_type": "definition_activity",
+                    "actions": [
+                      {
+                        "unique_name": "definition_activity_02VAOMFKODL2U7NT8LrzFK3ID3h37Dtj9Gu",
+                        "name": "Resolve Hub and Spokes",
+                        "title": "Resolve Hub and Spokes",
+                        "type": "corejava.jsonpathquery",
+                        "base_type": "activity",
+                        "properties": {
+                          "action_timeout": 180,
+                          "continue_on_failure": false,
+                          "display_name": "Resolve Hub and Spokes",
+                          "input_json": "$activity.definition_activity_02VAOMFKOAEZ82ZpvNOyNsah9TzU6NC8PeB.output.variable_workflow_02L9TZH6C8OZI7c9t9Z0h0JHAbqCc7LuTGT$",
+                          "jsonpath_queries": [
+                            {
+                              "jsonpath_query": "$[?(@.name == '$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.input.variable_workflow_02VAOMFKO78F33fVrRVdJFKkPi8nuUEegpv$')].id",
+                              "jsonpath_query_name": "hub_id",
+                              "jsonpath_query_type": "string",
+                              "set_default_value": false,
+                              "zdate_type_format": "yyyy-MM-dd'T'HH:mm:ssZ"
+                            },
+                            {
+                              "jsonpath_query": "$[?('$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.input.variable_workflow_02VAOMFKO7QS246FOpH0SwXNHjqX2whZeGv$' in @.tags)]",
+                              "jsonpath_query_name": "spoke_networks",
+                              "jsonpath_query_type": "array",
+                              "set_default_value": false,
+                              "zdate_type_format": "yyyy-MM-dd'T'HH:mm:ssZ"
+                            }
+                          ],
+                          "skip_execution": false
+                        },
+                        "object_type": "definition_activity"
+                      },
+                      {
+                        "unique_name": "definition_activity_02VAOMFKODW9T6knhABoGNyVTRVcN0fSRtd",
+                        "name": "Check Hub Found",
+                        "title": "Check Hub Found",
+                        "type": "logic.if_else",
+                        "base_type": "activity",
+                        "properties": {
+                          "continue_on_failure": false,
+                          "display_name": "Check Hub Found",
+                          "skip_execution": false
+                        },
+                        "object_type": "definition_activity",
+                        "blocks": [
+                          {
+                            "unique_name": "definition_activity_02VAOMFKOE5N41RrDROLZ2jefvp68opVI4C",
+                            "name": "Hub Found",
+                            "title": "Hub Found",
+                            "type": "logic.condition_block",
+                            "base_type": "activity",
+                            "properties": {
+                              "condition": {
+                                "left_operand": "$activity.definition_activity_02VAOMFKODL2U7NT8LrzFK3ID3h37Dtj9Gu.output.jsonpath_queries.hub_id$",
+                                "operator": "ne",
+                                "right_operand": ""
+                              },
+                              "continue_on_failure": false,
+                              "display_name": "Hub Found",
+                              "skip_execution": false
+                            },
+                            "object_type": "definition_activity",
+                            "actions": [
+                              {
+                                "unique_name": "definition_activity_02VAOMFKOEC481m2icAokAys37kKM9hsbVE",
+                                "name": "Prepare Hubs Config",
+                                "title": "Prepare Hubs Config",
+                                "type": "python3.script",
+                                "base_type": "activity",
+                                "properties": {
+                                  "action_timeout": 180,
+                                  "continue_on_failure": false,
+                                  "display_name": "Prepare Hubs Config",
+                                  "script": "\nimport json \n  \nhub_id = \"$activity.definition_activity_02VAOMFKODL2U7NT8LrzFK3ID3h37Dtj9Gu.output.jsonpath_queries.hub_id$\" \nhubs_config = json.dumps([{\"hubId\": hub_id, \"useDefaultRoute\": True}]) \nprint(hubs_config)",
+                                  "script_arguments": [],
+                                  "script_queries": [
+                                    {
+                                      "script_query": "hubs_config",
+                                      "script_query_name": "hubs_config",
+                                      "script_query_type": "string"
+                                    }
+                                  ],
+                                  "skip_execution": false
+                                },
+                                "object_type": "definition_activity"
+                              },
+                              {
+                                "unique_name": "definition_activity_02VAOMFKOEIFG63la9WlHsvtskk83bO8l90",
+                                "name": "Store Local Variables",
+                                "title": "Store Local Variables",
+                                "type": "core.set_multiple_variables",
+                                "base_type": "activity",
+                                "properties": {
+                                  "action_timeout": 180,
+                                  "continue_on_failure": false,
+                                  "display_name": "Store Local Variables",
+                                  "skip_execution": false,
+                                  "variables_to_update": [
+                                    {
+                                      "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO8BBQ6t7CZxTMkoTbIkAE3483PQ$",
+                                      "variable_value_new": "$activity.definition_activity_02VAOMFKODL2U7NT8LrzFK3ID3h37Dtj9Gu.output.jsonpath_queries.hub_id$"
+                                    },
+                                    {
+                                      "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO8PR97c2N8RWmGO7Vyj4hoaHrs8$",
+                                      "variable_value_new": "$activity.definition_activity_02VAOMFKODL2U7NT8LrzFK3ID3h37Dtj9Gu.output.jsonpath_queries.spoke_networks$"
+                                    },
+                                    {
+                                      "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO90JE2JbNnHk5HWtrehXkO7Pzbd$",
+                                      "variable_value_new": "$activity.definition_activity_02VAOMFKOEC481m2icAokAys37kKM9hsbVE.output.script_queries.hubs_config$"
+                                    }
+                                  ]
+                                },
+                                "object_type": "definition_activity"
+                              },
+                              {
+                                "unique_name": "definition_activity_02VAOMFKOEOBF4BDTvudYHe0iEuR3s9SmEB",
+                                "name": "Read Spokes Table",
+                                "title": "Read Spokes Table",
+                                "type": "corejava.read_table_from_json",
+                                "base_type": "activity",
+                                "properties": {
+                                  "action_timeout": 180,
+                                  "continue_on_failure": false,
+                                  "display_name": "Read Spokes Table",
+                                  "input_json": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO8PR97c2N8RWmGO7Vyj4hoaHrs8$",
+                                  "jsonpath_query": "$",
+                                  "persist_output": false,
+                                  "populate_columns": false,
+                                  "skip_execution": false,
+                                  "table_columns": [
+                                    {
+                                      "column_name": "id",
+                                      "column_type": "string"
+                                    },
+                                    {
+                                      "column_name": "name",
+                                      "column_type": "string"
+                                    }
+                                  ]
+                                },
+                                "object_type": "definition_activity"
+                              },
+                              {
+                                "unique_name": "definition_activity_02VAOMFKOEUFI7lZApV6sP1EgoTRrK83zru",
+                                "name": "Configure Spokes",
+                                "title": "Configure Spokes",
+                                "type": "logic.for_each",
+                                "base_type": "activity",
+                                "properties": {
+                                  "continue_on_failure": false,
+                                  "display_name": "Configure Spokes",
+                                  "skip_execution": false,
+                                  "source_array": "$activity.definition_activity_02VAOMFKOEOBF4BDTvudYHe0iEuR3s9SmEB.output.read_table_from_json$"
+                                },
+                                "object_type": "definition_activity",
+                                "actions": [
+                                  {
+                                    "unique_name": "definition_activity_02VAOMFKOF3X12N5dMUHyAvPHKyBQ7cpGNt",
+                                    "name": "Update VPN Settings",
+                                    "title": "Update VPN Settings",
+                                    "type": "workflow.atomic_workflow",
+                                    "base_type": "subworkflow",
+                                    "properties": {
+                                      "action_timeout": 180,
+                                      "continue_on_failure": true,
+                                      "description": "Update the site-to-site VPN settings of a network. Only valid for MX networks in NAT mode.",
+                                      "display_name": "Update VPN Settings",
+                                      "input": {
+                                        "variable_workflow_02V1ITT3X9JQ01ybDq32KUbD7NmndtczEsG": "$activity.definition_activity_02VAOMFKOEUFI7lZApV6sP1EgoTRrK83zru.input.source_array[@].id$",
+                                        "variable_workflow_02V1ITT3X9L9K4dsiIrUQHW0B8L7ORNqL89": "spoke",
+                                        "variable_workflow_02V1ITT3X9MT43GNoCMr2OiXP9824cEOLI5": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.local.variable_workflow_02VAOMFKO90JE2JbNnHk5HWtrehXkO7Pzbd$",
+                                        "variable_workflow_02V1ITT3X9OCO6gnpCfJxUbd5Cc1Crpjh66": "[]",
+                                        "variable_workflow_02V1ITT3X9PW85lX3KvgwNGqd6ZmbrbvzvI": "{}",
+                                        "variable_workflow_02V1ITT3X9TR45ba56Okg0gZ8wosKA9kwu8": "[]"
+                                      },
+                                      "runtime_user": {
+                                        "target_default": true
+                                      },
+                                      "skip_execution": false,
+                                      "target": {
+                                        "target_type": "meraki.endpoint",
+                                        "use_workflow_target": true
+                                      },
+                                      "workflow_id": "definition_workflow_02V1ITT3X97DK6FNTRTMnVwDXj7k5WB8zEH",
+                                      "workflow_name": "Meraki - Update Network Appliance VPN Site To Site VPN"
+                                    },
+                                    "object_type": "definition_activity"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "unique_name": "definition_activity_02VAOMFKOFERS5sMbzvsPIaqKwZnbmdX9z2",
+                            "name": "Hub Not Found",
+                            "title": "Hub Not Found",
+                            "type": "logic.condition_block",
+                            "base_type": "activity",
+                            "properties": {
+                              "condition": {
+                                "left_operand": "$activity.definition_activity_02VAOMFKODL2U7NT8LrzFK3ID3h37Dtj9Gu.output.jsonpath_queries.hub_id$",
+                                "operator": "eq",
+                                "right_operand": ""
+                              },
+                              "continue_on_failure": false,
+                              "display_name": "Hub Not Found",
+                              "skip_execution": false
+                            },
+                            "object_type": "definition_activity",
+                            "actions": [
+                              {
+                                "unique_name": "definition_activity_02VAOMFKOFOAB18WBjxCRjsEvmwwLJDk9mm",
+                                "name": "Set Hub Error",
+                                "title": "Set Hub Error",
+                                "type": "core.set_multiple_variables",
+                                "base_type": "activity",
+                                "properties": {
+                                  "action_timeout": 180,
+                                  "continue_on_failure": false,
+                                  "display_name": "Set Hub Error",
+                                  "skip_execution": false,
+                                  "variables_to_update": [
+                                    {
+                                      "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.output.variable_workflow_02VAOMFKO97DZ6R9FkphUVzxvJN5mGlU9I6$",
+                                      "variable_value_new": "Failed: Hub network not found"
+                                    }
+                                  ]
+                                },
+                                "object_type": "definition_activity"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "unique_name": "definition_activity_02VAOMFKOFXHH1xcsIFgXg1fAHFZnj6jTZ2",
+                    "name": "Failure",
+                    "title": "Failure",
+                    "type": "logic.condition_block",
+                    "base_type": "activity",
+                    "properties": {
+                      "condition": {
+                        "left_operand": "$activity.definition_activity_02VAOMFKOAEZ82ZpvNOyNsah9TzU6NC8PeB.output.variable_workflow_02L9TZH6C9HVU3eHnLNP91ZKEfJOnaYpBsh$",
+                        "operator": "ne",
+                        "right_operand": "200"
+                      },
+                      "continue_on_failure": false,
+                      "display_name": "Failure",
+                      "skip_execution": false
+                    },
+                    "object_type": "definition_activity",
+                    "actions": [
+                      {
+                        "unique_name": "definition_activity_02VAOMFKOG7QU4Brda2uHpilk7pQJGqbfcY",
+                        "name": "Set Networks Error",
+                        "title": "Set Networks Error",
+                        "type": "core.set_multiple_variables",
+                        "base_type": "activity",
+                        "properties": {
+                          "action_timeout": 180,
+                          "continue_on_failure": false,
+                          "display_name": "Set Networks Error",
+                          "skip_execution": false,
+                          "variables_to_update": [
+                            {
+                              "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.output.variable_workflow_02VAOMFKO97DZ6R9FkphUVzxvJN5mGlU9I6$",
+                              "variable_value_new": "Failed: Could not retrieve networks"
+                            }
+                          ]
+                        },
+                        "object_type": "definition_activity"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "unique_name": "definition_activity_02VAOMFKOHZG951cgZf1iN9gwgpIBmCO7xe",
+            "name": "Org Not Found",
+            "title": "Org Not Found",
+            "type": "logic.condition_block",
+            "base_type": "activity",
+            "properties": {
+              "condition": {
+                "left_operand": "$activity.definition_activity_02VAOMFKO9EK27lMar3oNLHTShD5xG6ODSf.output.variable_workflow_02M605GTJITQP1fcLQlR8CLYAHoMomGWZvE$",
+                "operator": "eq",
+                "right_operand": ""
+              },
+              "continue_on_failure": false,
+              "display_name": "Org Not Found",
+              "skip_execution": false
+            },
+            "object_type": "definition_activity",
+            "actions": [
+              {
+                "unique_name": "definition_activity_02VAOMFKOICE73F1GuQe1HZNB8WBEOoc6WI",
+                "name": "Set Org Error",
+                "title": "Set Org Error",
+                "type": "core.set_multiple_variables",
+                "base_type": "activity",
+                "properties": {
+                  "action_timeout": 180,
+                  "continue_on_failure": false,
+                  "display_name": "Set Org Error",
+                  "skip_execution": false,
+                  "variables_to_update": [
+                    {
+                      "variable_to_update": "$workflow.definition_workflow_02VAOMFKO60H04lt4En2tGkVWbkwKfUeyGS.output.variable_workflow_02VAOMFKO97DZ6R9FkphUVzxvJN5mGlU9I6$",
+                      "variable_value_new": "Failed: Organization not found"
+                    }
+                  ]
+                },
+                "object_type": "definition_activity"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "category_1BMfMXSnJMyt5Ihqi7rWJr5N8cf"
+    ]
+  },
+  "atomic_workflows": [
+    "definition_workflow_02L9TZH5W95870XebPF2g8kSyIYcawUvljX",
+    "definition_workflow_02V1ITT3X97DK6FNTRTMnVwDXj7k5WB8zEH"
+  ],
+  "dependent_workflows": [
+    "definition_workflow_02M605GS81XN44qr4RBWrJ6Zazk7k0ArIYX",
+    "definition_workflow_02L9TZH5W95870XebPF2g8kSyIYcawUvljX",
+    "definition_workflow_02V1ITT3X97DK6FNTRTMnVwDXj7k5WB8zEH"
+  ]
+}
